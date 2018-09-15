@@ -9,18 +9,36 @@
       name: epel-release
       state: present
 
-  - name: Install nginx
+  tasks:
+  - name: remove nginx
     yum:
       name: nginx
+      state: absent
+
+  - name: Install packages using yum
+    yum:
+      name:
+        - httpd
+        - mysql
+        - mysql-server
+        - php
+        - php-mysql
+        - php-mcrypt
+        - php-xml
+        - php-cli
+        - php-soap
+        - php-ldap
+        - graphviz
       state: present
 
-  - name: Insert Index Page
-    template:
-      src: index.html
-      dest: /usr/share/nginx/html/index.html
+  - name: Enable services wtih systemctl
+    service:
+      name:
+        - httpd
+        - mysqld
+      state: enable
 
   - name:
     service:
-      name: nginx
+      name: httpd
       state: started
-
