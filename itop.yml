@@ -38,7 +38,6 @@
         - graphviz
       state: present
 
-<<<<<<< HEAD
   - name: Set SELinux for httpd
     seboolean:
       name:
@@ -53,13 +52,11 @@
         - httpd
         - mysqld
       state: enable
-=======
+
   - name: Custom /etc/php.ini
     template:
       src: php.ini.j2
       dest: /etc/php.ini
->>>>>>> 813db3dd63409e0c558569e971f232608fdc0242
-
 
   - name: Starting service Apache
     service:
@@ -72,4 +69,3 @@
       name: mariadb
       enabled: yes
       state: started
-
