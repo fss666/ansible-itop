@@ -29,34 +29,53 @@
         - mariadb
         - mariadb-server
         - php
+	- php-gd
         - php-mysql
         - php-mcrypt
         - php-xml
         - php-cli
+        - php-pecl-zip
         - php-soap
         - php-ldap
         - graphviz
       state: present
 
+  - name: Install (libsemanage-python) prereq for Ansible seboolean module
+    yum:
+      name: libsemanage-python
+      state: present
+
   - name: Set SELinux for httpd
     seboolean:
-      name:
-        - httpd_can_network_connect
-        - httpd_can_network_connect_db
+      name: httpd_can_network_connect_db
       state: yes
       persistent: yes
-
-  - name: Enable services wtih systemctl
-    service:
-      name:
-        - httpd
-        - mysqld
-      state: enable
 
   - name: Custom /etc/php.ini
     template:
       src: php.ini.j2
       dest: /etc/php.ini
+
+  - name: install iTop applicaiton
+    unarchive:
+      src: iTop-2.5.0-3935.zip 
+      dest: /var/www/html/
+
+  - name: CHOWN and CHMOD on iTop directory
+    file:
+      dest: /var/www/html/web
+      owner: apache
+      group: apache
+      mode: u=rwX,g=rX,o=rX
+      recurse: yes
+
+  - name: CHOWN and CHMOD on iTop directory
+    file:
+      dest: /var/www/html/web/log
+      owner: apache
+      group: apache
+      mode: u=rwX,g=rX,o=rX
+      recurse: yes
 
   - name: Starting service Apache
     service:
@@ -69,3 +88,5 @@
       name: mariadb
       enabled: yes
       state: started
+
+
