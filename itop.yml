@@ -1,6 +1,9 @@
 ---
 - name: Install iTop
   hosts: argentina.eastus.cloudapp.azure.com
+  vars:
+    post_max_size: 32M
+    suhosin_get_max_value_length: 2048
   become: true
 
   tasks:
@@ -9,18 +12,22 @@
       name: epel-release
       state: present
 
-  tasks:
-  - name: remove nginx
+  - name: Install the remi and ius repo from remote repo
     yum:
-      name: nginx
-      state: absent
+      name:
+        - "http://rpms.remirepo.net/enterprise/remi-release-{{ ansible_distribution_major_version }}.rpm"
+        - "https://centos{{ ansible_distribution_major_version }}.iuscommunity.org/ius-release.rpm"
+
+  - name: Enable remi-php71 repository
+    shell: yum-config-manager --enable remi-php71
+
 
   - name: Install packages using yum
     yum:
       name:
         - httpd
-        - mysql
-        - mysql-server
+        - mariadb
+        - mariadb-server
         - php
         - php-mysql
         - php-mcrypt
@@ -31,14 +38,38 @@
         - graphviz
       state: present
 
+<<<<<<< HEAD
+  - name: Set SELinux for httpd
+    seboolean:
+      name:
+        - httpd_can_network_connect
+        - httpd_can_network_connect_db
+      state: yes
+      persistent: yes
+
   - name: Enable services wtih systemctl
     service:
       name:
         - httpd
         - mysqld
       state: enable
+=======
+  - name: Custom /etc/php.ini
+    template:
+      src: php.ini.j2
+      dest: /etc/php.ini
+>>>>>>> 813db3dd63409e0c558569e971f232608fdc0242
 
-  - name:
+
+  - name: Starting service Apache
     service:
       name: httpd
+      enabled: yes
       state: started
+
+  - name: Starting service MySQL/mariaDB
+    service:
+      name: mariadb
+      enabled: yes
+      state: started
+
