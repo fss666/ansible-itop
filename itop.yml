@@ -3,13 +3,24 @@
   hosts: argentina.eastus.cloudapp.azure.com
   become: true
 
-tasks:
+  tasks:
   - name: Add epel-release repo
-  yum:
-    name: epel-release
-    state: present
+    yum:
+      name: epel-release
+      state: present
 
-  -name: Install nginx
-  yum:
-    name: nginx
-    state: present
+  - name: Install nginx
+    yum:
+      name: nginx
+      state: present
+
+  - name: Insert Index Page
+    template:
+      src: index.html
+      dest: /usr/share/nginx/html/index.html
+
+  - name:
+    service:
+      name: nginx
+      state: started
+
